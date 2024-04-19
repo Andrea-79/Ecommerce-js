@@ -1,60 +1,99 @@
-//Definición de los productos como objetos
+// Definición de los productos como objetos
 const productos = [
-    { codigo: 1, nombre: 'Zapatos', precio: 19000 },
+    { codigo: 1, nombre: 'Zapatos', precio: 19000, imagen: 'https://media.istockphoto.com/photos/elegant-black-leather-shoes-picture-id172417586?k=20&m=172417586&s=170667a&w=0&h=UWbFflNWADUK7RI2djsyKprk3jJfhgsjEIRdA5Ld4yk=' },
     { codigo: 2, nombre: 'Bolso', precio: 14000 },
     { codigo: 3, nombre: 'Cinturón', precio: 11000 },
     { codigo: 4, nombre: 'Billetera', precio: 9000 }
 ];
 
-let total = 0;
-const IVA = 0.21;
-const DESC_EF = 0.1;
-const RECARGO_CREDITO = 0.04;
+// Convertir productos a JSON y almacenar en localStorage
+const productosJSON = JSON.stringify(productos);
+localStorage.setItem('productos', productosJSON);
 
-function buscarProducto(codigo) {
-    return productos.find(producto => producto.codigo === codigo);
+let carrito = [];
+
+function toggleProductos() {
+    const productosContainer = document.getElementById('productos-container');
+    const botonMostrar = document.querySelector('.btn-primary');
+
+    if (productosContainer.style.display === 'none') {
+        mostrarProductos();
+        botonMostrar.textContent = 'Ocultar Productos';
+    } else {
+        productosContainer.innerHTML = '';
+        productosContainer.style.display = 'none';
+        botonMostrar.textContent = 'Mostrar Productos';
+    }
 }
 
 function mostrarProductos() {
-    let listaProductos = 'Lista de productos disponibles:\n';
-    productos.forEach(producto => {
-        listaProductos += `${producto.codigo} - ${producto.nombre} - $${producto.precio}\n`;
+    // Recuperar productos desde localStorage y convertir de JSON a objeto
+    const productosRecuperadosJSON = localStorage.getItem('productos');
+    const productosRecuperados = JSON.parse(productosRecuperadosJSON);
+
+    const productosContainer = document.getElementById('productos-container');
+    productosContainer.innerHTML = '';
+
+    productosRecuperados.forEach(producto => {
+        const productoDiv = document.createElement('div');
+        productoDiv.innerHTML = `
+            <div class="producto">${producto.nombre} - $${producto.precio}</div>
+            <button class="btn btn-success" onclick="agregarAlCarrito(${producto.codigo})">Agregar al carrito</button>
+        `;
+        productosContainer.appendChild(productoDiv);
     });
-    alert(listaProductos);
+
+    productosContainer.style.display = 'block';
 }
 
-let codProd = parseInt(prompt('Ingrese el código del producto a comprar\n(0 para salir)\n'));
-while (codProd !== 0) {
-    let producto = buscarProducto(codProd);
+function agregarAlCarrito(codigo) {
+    const producto = productos.find(prod => prod.codigo === codigo);
     if (producto) {
-        total += producto.precio;
-        alert(`Agregaste ${producto.nombre} a tu carrito 🛒 Total acumulado: $${total}`);
-    } else {
-        alert('Código de producto inválido 😕');
+        carrito.push(producto);
+        mostrarCarrito();
     }
-    codProd = parseInt(prompt('Ingrese el código del producto a comprar\n(0 para salir)\n'));
 }
 
-if (total !== 0) {
-    let modoPago = parseInt(prompt('💵 ¿Cómo deseas abonar?\n1 - Efectivo\n2 - Débito\n3 - Crédito'));
+function mostrarCarrito() {
+    const carritoContainer = document.getElementById('carrito-container');
+    carritoContainer.innerHTML = '';
 
-    let totalPagar = 0;
+    carrito.forEach(producto => {
+        const productoDiv = document.createElement('div');
+        productoDiv.textContent = `${producto.nombre} - $${producto.precio}`;
+        carritoContainer.appendChild(productoDiv);
+    });
+}
+
+function calcularTotal() {
+    let total = 0;
+
+    const modoPago = document.getElementById('modo-pago').value;
+    const IVA = 0.21;
+    const DESC_EF = 0.1;
+    const RECARGO_CREDITO = 0.04;
+
+    carrito.forEach(producto => {
+        total += producto.precio;
+    });
+
     switch (modoPago) {
-        case 1:
-            totalPagar = aplicarImpuestosyDescuentos(total, IVA, DESC_EF);
+        case 'efectivo':
+            total = aplicarImpuestosyDescuentos(total, IVA, DESC_EF);
             break;
-        case 2:
-            totalPagar = aplicarImpuestosyDescuentos(total, IVA, 0);
+        case 'debito':
+            total = aplicarImpuestosyDescuentos(total, IVA, 0);
             break;
-        case 3:
-            totalPagar = aplicarImpuestosyDescuentos(total, IVA + RECARGO_CREDITO, 0);
+        case 'credito':
+            total = aplicarImpuestosyDescuentos(total, IVA + RECARGO_CREDITO, 0);
             break;
         default:
             alert('Opción inválida!');
             break;
     }
 
-    alert(`Total a pagar 💵: $${totalPagar.toFixed(2)}`);
+    const totalContainer = document.getElementById('total-container');
+    totalContainer.textContent = `Total a pagar 💵: $${total.toFixed(2)}`;
 }
 
 function aplicarImpuestosyDescuentos(total, impuestos, descuentos) {
@@ -63,4 +102,7 @@ function aplicarImpuestosyDescuentos(total, impuestos, descuentos) {
     return totalConImpuestosYDescuentos;
 }
 
-
+function limpiarCarrito() {
+    carrito = [];
+    mostrarCarrito();
+}
