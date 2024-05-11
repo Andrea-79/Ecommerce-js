@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trabajo JS - E-commerce Zapateria</title>
+    <!-- Incluir Bootstrap CSS -->
+    <link href="bootstrap.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>E-commerce Zapatería</h1>
+        <button class="btn btn-primary" onclick="toggleProductos()">Mostrar/Ocultar Productos</button>
+        <div id="productos-container" class="productos-container" style="display: none;"></div>
+        <div id="carrito-container" class="carrito-container"></div>
+        <div class="form-group">
+            <label for="modo-pago">Selecciona el modo de pago:</label>
+            <select id="modo-pago" class="form-control">
+                <option value="efectivo">Efectivo</option>
+                <option value="debito">Débito</option>
+                <option value="credito">Crédito</option>
+            </select>
+        </div>
+        <button class="btn btn-primary" onclick="calcularTotal()">Calcular Total</button>
+        <div id="total-container" class="total-container"></div>
+        <button class="btn btn-danger" onclick="limpiarCarrito()">Limpiar Carrito</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
