@@ -1,9 +1,8 @@
-// script.js
-
 // URL del archivo JSON que contiene los productos
 const productsUrl = 'productos.json';
 
-let carrito = [];
+// Recuperar el carrito del localStorage, si existe, y parsearlo a un array
+const carrito = JSON.parse(localStorage.getItem('carrito')) || [];
 let productosRecuperados = []; // Variable global para almacenar los productos una vez recuperados
 
 // Función para cargar los productos utilizando fetch
@@ -26,7 +25,7 @@ function cargarProductos() {
 // Función para mostrar u ocultar los productos
 function toggleProductos() {
     const productosContainer = document.getElementById('productos-container');
-    const botonMostrar = document.querySelector('.btn-primary');
+    const botonMostrar = document.querySelector('.btn-outline-primary');
 
     if (productosContainer.style.display === 'none') {
         mostrarProductos();
@@ -60,6 +59,7 @@ function agregarAlCarrito(codigo) {
     if (producto) {
         carrito.push(producto);
         mostrarCarrito();
+        guardarCarritoEnLocalStorage(); // Guardar el carrito actualizado en el localStorage
     }
 }
 
@@ -73,6 +73,11 @@ function mostrarCarrito() {
         productoDiv.textContent = `${producto.nombre} - $${producto.precio}`;
         carritoContainer.appendChild(productoDiv);
     });
+}
+
+// Función para guardar el carrito en el localStorage
+function guardarCarritoEnLocalStorage() {
+    localStorage.setItem('carrito', JSON.stringify(carrito));
 }
 
 // Función para calcular el total a pagar
@@ -116,10 +121,13 @@ function aplicarImpuestosyDescuentos(total, impuestos, descuentos) {
 
 // Función para limpiar el carrito
 function limpiarCarrito() {
-    carrito = [];
+    carrito.length = 0;
     mostrarCarrito();
+    guardarCarritoEnLocalStorage(); // Guardar el carrito vacío en el localStorage
 }
 
-// Cargar los productos al cargar la página
-cargarProductos();
-
+// Cargar los productos y el carrito al cargar la página
+window.onload = function() {
+    cargarProductos();
+    mostrarCarrito();
+};
